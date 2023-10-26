@@ -1,3 +1,4 @@
+const { all } = require("./movies.router");
 const moviesService = require("./movies.service");
 
 async function movieExists(req, res, next) {
@@ -25,6 +26,18 @@ async function listTheaterMovies(req, res) {
   res.json({ data })
 }
 
+async function listReviews(req, res) {
+  const movieId = res.locals.movie.movie_id;
+  const reviews = await service.listReviews(movieId);
+  const allReviews = [];
+  for (let i = 0; i < reviews.length; i++) {
+    const review = reviews[i];
+    const critic = await service.getCritics(review.critic_id);
+    review.critic = critic[0];
+    allReviews.push(review);
+  }
+  res.status(200).json({ data: allReviews });
+}
 
 
 
@@ -34,4 +47,5 @@ module.exports = {
   list,
   read: [movieExists, read],
   listTheaterMovies,
+  listReviews,
 }
